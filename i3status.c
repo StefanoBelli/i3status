@@ -474,6 +474,24 @@ int main(int argc, char *argv[]) {
         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
         CFG_END()};
 
+    cfg_opt_t memory_opts[] = {
+        CFG_STR("format", "mem: %avail", CFGF_NONE),
+        CFG_CUSTOM_ALIGN_OPT,
+        CFG_CUSTOM_COLOR_OPTS,
+        CFG_CUSTOM_MIN_WIDTH_OPT,
+        CFG_CUSTOM_SEPARATOR_OPT,
+        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+        CFG_END()};
+
+    cfg_opt_t swap_opts[] = {
+        CFG_STR("format", "swap: %avail", CFGF_NONE),
+        CFG_CUSTOM_ALIGN_OPT,
+        CFG_CUSTOM_COLOR_OPTS,
+        CFG_CUSTOM_MIN_WIDTH_OPT,
+        CFG_CUSTOM_SEPARATOR_OPT,
+        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+        CFG_END()};
+
     cfg_opt_t opts[] = {
         CFG_STR_LIST("order", "{}", CFGF_NONE),
         CFG_SEC("general", general_opts, CFGF_NONE),
@@ -491,6 +509,8 @@ int main(int argc, char *argv[]) {
         CFG_SEC("ddate", ddate_opts, CFGF_NONE),
         CFG_SEC("load", load_opts, CFGF_NONE),
         CFG_SEC("cpu_usage", usage_opts, CFGF_NONE),
+        CFG_SEC("memory", memory_opts, CFGF_NONE),
+        CFG_SEC("swap", swap_opts, CFGF_NONE),
         CFG_END()};
 
     char *configfile = NULL;
@@ -758,7 +778,20 @@ int main(int argc, char *argv[]) {
                 print_cpu_usage(json_gen, buffer, cfg_getstr(sec, "format"), cfg_getstr(sec, "format_above_threshold"), cfg_getstr(sec, "format_above_degraded_threshold"), cfg_getstr(sec, "path"), cfg_getfloat(sec, "max_threshold"), cfg_getfloat(sec, "degraded_threshold"));
                 SEC_CLOSE_MAP;
             }
+
+            CASE_SEC("memory") {
+                SEC_OPEN_MAP("memory");
+                print_memory_info(json_gen, buffer, cfg_getstr(sec, "format"));
+                SEC_CLOSE_MAP;
+            }
+
+            CASE_SEC("swap") {
+                SEC_OPEN_MAP("swap");
+                print_swap_info(json_gen, buffer, cfg_getstr(sec, "format"));
+                SEC_CLOSE_MAP;
+            }
         }
+
         if (output_format == O_I3BAR) {
             yajl_gen_array_close(json_gen);
             const unsigned char *buf;
