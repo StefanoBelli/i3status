@@ -492,6 +492,24 @@ int main(int argc, char *argv[]) {
         CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
         CFG_END()};
 
+    cfg_opt_t uptime_opts[] = {
+        CFG_STR("format", "uptime: %day %hour %minute %second", CFGF_NONE),
+        CFG_CUSTOM_ALIGN_OPT,
+        CFG_CUSTOM_COLOR_OPTS,
+        CFG_CUSTOM_MIN_WIDTH_OPT,
+        CFG_CUSTOM_SEPARATOR_OPT,
+        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+        CFG_END()};
+
+    cfg_opt_t procs_opts[] = {
+        CFG_STR("format", "procs: %procs", CFGF_NONE),
+        CFG_CUSTOM_ALIGN_OPT,
+        CFG_CUSTOM_COLOR_OPTS,
+        CFG_CUSTOM_MIN_WIDTH_OPT,
+        CFG_CUSTOM_SEPARATOR_OPT,
+        CFG_CUSTOM_SEP_BLOCK_WIDTH_OPT,
+        CFG_END()};
+
     cfg_opt_t opts[] = {
         CFG_STR_LIST("order", "{}", CFGF_NONE),
         CFG_SEC("general", general_opts, CFGF_NONE),
@@ -511,6 +529,8 @@ int main(int argc, char *argv[]) {
         CFG_SEC("cpu_usage", usage_opts, CFGF_NONE),
         CFG_SEC("memory", memory_opts, CFGF_NONE),
         CFG_SEC("swap", swap_opts, CFGF_NONE),
+        CFG_SEC("procs", procs_opts, CFGF_NONE),
+        CFG_SEC("uptime", uptime_opts, CFGF_NONE),
         CFG_END()};
 
     char *configfile = NULL;
@@ -788,6 +808,18 @@ int main(int argc, char *argv[]) {
             CASE_SEC("swap") {
                 SEC_OPEN_MAP("swap");
                 print_swap_info(json_gen, buffer, cfg_getstr(sec, "format"));
+                SEC_CLOSE_MAP;
+            }
+            
+            CASE_SEC("uptime") {
+                SEC_OPEN_MAP("uptime");
+                print_uptime_info(json_gen, buffer, cfg_getstr(sec, "format"));
+                SEC_CLOSE_MAP;
+            }
+
+            CASE_SEC("procs") {
+                SEC_OPEN_MAP("procs");
+                print_procs_info(json_gen, buffer, cfg_getstr(sec, "format"));
                 SEC_CLOSE_MAP;
             }
         }
